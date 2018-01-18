@@ -1,6 +1,7 @@
 package entity_recognition_rule_based;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,10 @@ public class Main {
 		
 		inputFile = new File(args[0]);
 		outputFile = new File(args[1]);
+		
 		List<Token> testDataList = new ArrayList<Token>();
+		List<String> trainDataList = new ArrayList<String>();
+		
 		Set<String> stopWords = new HashSet<String>();
 		Map<String,String> dictionary = new HashMap<String,String>();
 		
@@ -62,7 +66,7 @@ public class Main {
 			String genes_content = FileUtils.readFileToString(new File("human-genenames.txt"), "UTF-8");
 			String[] genes_entries = genes_content.split("[\\r\\n]+");
 			for (String s : genes_entries) {
-				dictionary.put(s.toLowerCase(), "Human-gene");
+				dictionary.put(s.toLowerCase(), "B-protein");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -73,8 +77,11 @@ public class Main {
 		try {
 			String training_content = FileUtils.readFileToString(new File("uebung4-training.iob"), "UTF-8");
 			String[] training_entries = training_content.split("[\\r\\n]+");
+			
+			
 			for (String s : training_entries) {
 				String[] splitWordTag = s.split("\\t");
+				trainDataList.add(splitWordTag[0]);
 				if(!splitWordTag[1].equals("0")) dictionary.put(splitWordTag[0], splitWordTag[1]);
 			}
 		} catch (Exception e) {
@@ -83,12 +90,17 @@ public class Main {
 		
 		
 		
-		Recognizer recognizer = new Recognizer(testDataList,stopWords,dictionary);
+		try {
+			Recognizer recognizer = new Recognizer(trainDataList,stopWords,dictionary);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
-		List<Token> taggedList = recognizer.recognize();
-		Writer writer = new Writer();
-		writer.writeToFile(outputFile, taggedList);
+//		List<Token> taggedList = recognizer.recognize(testDataList);
+//		Writer writer = new Writer();
+//		writer.writeToFile(outputFile, taggedList);
 		
 	}
 }
