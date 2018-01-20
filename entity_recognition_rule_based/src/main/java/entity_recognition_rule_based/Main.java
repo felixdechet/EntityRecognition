@@ -92,15 +92,13 @@ public class Main {
 		
 		try {
 			Recognizer recognizer = new Recognizer(trainDataList,stopWords,dictionary);
+			List<Token> taggedList = recognizer.recognize(testDataList);
+			Writer writer = new Writer();
+			writer.writeToFile(outputFile, taggedList);
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-//		List<Token> taggedList = recognizer.recognize(testDataList);
-//		Writer writer = new Writer();
-//		writer.writeToFile(outputFile, taggedList);
-		
 	}
 }

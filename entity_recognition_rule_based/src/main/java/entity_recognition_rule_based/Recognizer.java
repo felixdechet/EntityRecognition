@@ -16,6 +16,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.SentenceUtils;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Recognizer {
 	
 	private List<String> trainTokenList;
@@ -57,6 +59,14 @@ public class Recognizer {
 			String lowerCaseToken = token.getToken().toLowerCase();
 			if(!this.stopWords.contains(lowerCaseToken)) {
 				if(this.dictionary.keySet().contains(lowerCaseToken)) token.setTag(this.dictionary.get(lowerCaseToken));
+			} else if (!StringUtils.isAllUpperCase(token.getToken())
+					&& !StringUtils.isAllLowerCase(token.getToken())
+					&& !Character.isUpperCase(token.getToken().charAt(0))) {
+				// token is mixed case, but exclude first word of sentence (beginning with capital letter)
+				token.setTag("B-protein");
+			} else if (token.getToken().matches(".*\\d+.*")) {
+				// token contains digits
+				token.setTag("B-protein");
 			}
 		}
 		
