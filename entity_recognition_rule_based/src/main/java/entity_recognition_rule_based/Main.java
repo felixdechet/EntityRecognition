@@ -29,7 +29,8 @@ public class Main {
 		outputFile = new File(args[1]);
 		
 		List<Token> testDataList = new ArrayList<Token>();
-		List<String> trainDataList = new ArrayList<String>();
+		List<Token> trainDataList = new ArrayList<Token>();
+		List<String> untaggedTrainDataList = new ArrayList<String>();
 		
 		Set<String> stopWords = new HashSet<String>();
 		Map<String,String> dictionary = new HashMap<String,String>();
@@ -81,8 +82,9 @@ public class Main {
 			
 			for (String s : training_entries) {
 				String[] splitWordTag = s.split("\\t");
-				trainDataList.add(splitWordTag[0]);
-				if(!splitWordTag[1].equals("0")) dictionary.put(splitWordTag[0], splitWordTag[1]);
+				trainDataList.add(new Token(splitWordTag[0],splitWordTag[1]));
+				untaggedTrainDataList.add(splitWordTag[0]);
+//				if(!splitWordTag[1].equals("0")) dictionary.put(splitWordTag[0], splitWordTag[1]);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -91,14 +93,19 @@ public class Main {
 		
 		
 		try {
-			Recognizer recognizer = new Recognizer(trainDataList,stopWords,dictionary);
-			List<Token> taggedList = recognizer.recognize(testDataList);
+			Recognizer recognizer = new Recognizer(trainDataList,untaggedTrainDataList,stopWords,dictionary);
+
+			List<Token> taggedList = recognizer.recognize(trainDataList,1.0);
 			Writer writer = new Writer();
 			writer.writeToFile(outputFile, taggedList);
-
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
+		
 	}
 }
